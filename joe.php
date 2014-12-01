@@ -4,11 +4,16 @@
 
 <?php
 $conn = mysql_connect('localhost','root');
-	if(! $conn )
+	if(!$conn)
 	{
 		die('Could not connect: ' . mysql_error());
 	}
 mysql_select_db('joe');
+$query2 =("SELECT problem FROM problems
+	ORDER BY id DESC LIMIT 1");
+$result2 = mysql_query($query2) or die ('Error in query: $query2, ' . mysql_error());
+$num1 = mysql_fetch_row($result2);
+$num1 = (int)$num1;
 if(isset($_POST['submit']))
 {
 	$num2 = (int)$_POST['number']; 
@@ -20,19 +25,11 @@ else
 }
 
 if(empty($_POST['number']))
-{
-	$query =("SELECT problem FROM problems
-	ORDER BY id DESC LIMIT 1");
-	$num1 = mysql_query((int)$query);
-	echo (int)$num1;
+{	
+	echo $num1;
 }
 else if (isset($_POST['number']))
 {	
-	$query = mysql_query("SELECT problem FROM problems
-	ORDER BY id DESC LIMIT 1");
-	$num1 = mysql_query((int)$query);
-	
-	
 	if ($function == "+")
 	{
 		$total = $num1 + $num2; 
@@ -73,11 +70,8 @@ if (!isset($_POST['submit']))
 }
 else if (isset($_POST['submit']))
 {
-	if (empty($_POST['number']))
+	if (!isset($_POST['number']))
 	{			
-		$query =("SELECT problem FROM problems
-		ORDER BY id DESC LIMIT 1");
-		$num1 = mysql_query((int)$query);	
 		$num2 = 0;
 		$problem = $total;	
 		$query =("INSERT INTO problems(num1,operator,num2,problem) VALUES
@@ -90,10 +84,7 @@ else if (isset($_POST['submit']))
 	}
 	else 
 	{		
-		$problem = $total;
-		$query =("SELECT problem FROM problems
-		ORDER BY id DESC LIMIT 1");
-		$num1 = mysql_query((int)$query);		
+		$problem = $total;	
 		$query =("INSERT INTO problems (num1,operator,num2,problem) VALUES 
 		($num1,'$function',$num2,$problem)");
 		$result = mysql_query($query,$conn) or die ('Error in query: $query, ' . mysql_error());
@@ -102,8 +93,8 @@ else if (isset($_POST['submit']))
 				die('Could not enter data: ' . mysql_error());
 			}
 			echo "Entered data successfully" . '<br />';
-		$sql = ("SELECT * FROM problems ORDER BY id DESC");
-		$result1 = mysql_query($sql,$conn) or die ('Error in query: $query1, ' . mysql_error());	
+		$query1 = ("SELECT * FROM problems ORDER BY id DESC");
+		$result1 = mysql_query($query1,$conn) or die ('Error in query: $query1, ' . mysql_error());	
 		
 		if ($result1 || mysql_num_rows($result1) > 0)
 			{
