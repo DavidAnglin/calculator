@@ -21,9 +21,14 @@ if(isset($_POST['submit']))
 	$function = $_POST['operation'];
 }
 if(empty($_POST['number']))
-{	
+{		
+	if (isset($_POST['clear']))
+	{
+		$num1 = 0;
+	}
 	echo $num1;
 }
+	
 else if (isset($_POST['number']))
 {	
 	if ($function == "+")
@@ -41,9 +46,8 @@ else if (isset($_POST['number']))
 	else if($function == "/")
 	{
 		$total = $num1 / $num2;
-	}	
-	echo $total . '<br />';
-	
+	}
+	echo $total;
 }	
 ?>
 <!-- form inputs -->
@@ -57,9 +61,23 @@ else if (isset($_POST['number']))
 
 <input type="number" name="number" placeholder="number" size="3">
 <input type="submit" name="submit" value="Equals">
+<input type="submit" name="clear"  value="Clear">
 </form> 
 
 <?php
+if (isset($_POST['clear']))
+{
+	$sql = "TRUNCATE TABLE problems";
+	$clear = mysql_query($sql) or die ('Error in query: $query1, ' . mysql_error());
+	if ($clear === TRUE) 
+	{
+		echo "Previous problems deleted successfully";		
+	} 	
+	else 
+	{
+		echo "Error deleting problems: ";
+	}
+}
 if (!isset($_POST['submit']))	
 {
 	$query1 = ("SELECT * FROM problems ORDER BY id DESC");
@@ -77,7 +95,6 @@ else if (isset($_POST['submit']))
 {
 	if (!isset($_POST['number']))
 	{			
-		$num2 = 0;
 		$problem = $total;	
 		$query =("INSERT INTO problems(num1,operator,num2,problem) VALUES
 		($num1,'$function',$num2,$problem)");
@@ -98,16 +115,17 @@ else if (isset($_POST['submit']))
 				die('Could not enter data: ' . mysql_error());
 			}
 			echo "Entered data successfully:" . '<br />' . '<br />';
+		
 		$query1 = ("SELECT * FROM problems ORDER BY id DESC");
 		$result1 = mysql_query($query1,$conn) or die ('Error in query: $query1, ' . mysql_error());	
 		
 		if ($result1 || mysql_num_rows($result1) > 0)
+		{
+			while ($row = mysql_fetch_array($result1))
 			{
-				while ($row = mysql_fetch_array($result1))
-				{
-					echo $row['num1'] . $row['operator'] . $row['num2'] . "=" . $row['problem'] . '<br />';
-				}
+				echo $row['num1'] . $row['operator'] . $row['num2'] . "=" . $row['problem'] . '<br />';
 			}
+		}
 	}
 	mysql_close($conn);	
 }
