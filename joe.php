@@ -13,12 +13,13 @@ $query2 =("SELECT problem FROM problems
 	ORDER BY id DESC LIMIT 1");
 $result2 = mysql_query($query2) or die ('Error in query: $query2, ' . mysql_error());
 $num = mysql_fetch_row($result2);
-$num1 = $num[0];
-$num1 = (int)$num1;
+$num1 = (int)$num[0];
+
 if(isset($_POST['submit']))
 {
-	$num2 = (int)$_POST['number']; 
+	$num2 = $_POST['number']; 
 	$function = $_POST['operation'];
+	$total = $num1 . $function . $num2;
 }
 if(empty($_POST['number']))
 {		
@@ -26,9 +27,9 @@ if(empty($_POST['number']))
 	{
 		$num1 = 0;
 	}
+	$num2 = 0;	
 	echo $num1;
-}
-	
+}	
 else if (isset($_POST['number']))
 {	
 	if ($function == "+")
@@ -93,29 +94,49 @@ if (!isset($_POST['submit']))
 }
 else if (isset($_POST['submit']))
 {
-	if (!isset($_POST['number']))
-	{			
-		$problem = $total;	
+	if (empty($_POST['number']))
+	{	
+		$num2 = 0;
+		$total = $num1 . $function . $num2;
 		$query =("INSERT INTO problems(num1,operator,num2,problem) VALUES
-		($num1,'$function',$num2,$problem)");
-		$result = mysql_query($query);		
+		($num1,'$function',$num2,$total)");
+		$result = mysql_query($query) or die ('Error in query: $query, ' . mysql_error());;		
 		if(!$result)
 			{
 				die('Could not enter data: ' . mysql_error());
 			}
+		$query1 = ("SELECT * FROM problems ORDER BY id DESC");
+		$result1 = mysql_query($query1,$conn) or die ('Error in query: $query1, ' . mysql_error());	
+		
+		if ($result1 || mysql_num_rows($result1) > 0)
+		{
+			while ($row = mysql_fetch_array($result1))
+			{
+				echo $row['num1'] . $row['operator'] . $row['num2'] . "=" . $row['problem'] . '<br />';
+			}
+		}
 	}
-	else 
+	else if (!isset($_POST['number']))
+	{	
+		$query =("INSERT INTO problems(num1,operator,num2,problem) VALUES
+		($num1,'$function',$num2,$total)");
+		$result = mysql_query($query) or die ('Error in query: $query, ' . mysql_error());;		
+		if(!$result)
+			{
+				die('Could not enter data: ' . mysql_error());
+			}
+	}	
+	else
 	{		
-		$problem = $total;	
 		$query =("INSERT INTO problems (num1,operator,num2,problem) VALUES 
-		($num1,'$function',$num2,$problem)");
-		$result = mysql_query($query,$conn) or die ('Error in query: $query, ' . mysql_error());
+		($num1,'$function',$num2,$total)");
+		$result = mysql_query($query) or die ('Error in query: $query, ' . mysql_error());
 			if(!$result)
 			{
 				die('Could not enter data: ' . mysql_error());
 			}
 			echo "Entered data successfully:" . '<br />' . '<br />';
-		
+			
 		$query1 = ("SELECT * FROM problems ORDER BY id DESC");
 		$result1 = mysql_query($query1,$conn) or die ('Error in query: $query1, ' . mysql_error());	
 		
