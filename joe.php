@@ -12,18 +12,14 @@ mysql_select_db('joe');
 $query2 =("SELECT problem FROM problems
 	ORDER BY id DESC LIMIT 1");
 $result2 = mysql_query($query2) or die ('Error in query: $query2, ' . mysql_error());
-$num1 = mysql_fetch_row($result2);
+$num = mysql_fetch_row($result2);
+$num1 = $num[0];
 $num1 = (int)$num1;
 if(isset($_POST['submit']))
 {
 	$num2 = (int)$_POST['number']; 
 	$function = $_POST['operation'];
 }
-else
-{
-	echo "No inputs yet!" . '<br />';
-}
-
 if(empty($_POST['number']))
 {	
 	echo $num1;
@@ -66,7 +62,16 @@ else if (isset($_POST['number']))
 <?php
 if (!isset($_POST['submit']))	
 {
-	echo "No problems yet";
+	$query1 = ("SELECT * FROM problems ORDER BY id DESC");
+	$result1 = mysql_query($query1,$conn) or die ('Error in query: $query1, ' . mysql_error());	
+		
+	if ($result1 || mysql_num_rows($result1) > 0)
+	{
+		while ($row = mysql_fetch_array($result1))
+		{
+			echo $row['num1'] . $row['operator'] . $row['num2'] . "=" . $row['problem'] . '<br />';
+		}
+	}	
 }
 else if (isset($_POST['submit']))
 {
@@ -92,7 +97,7 @@ else if (isset($_POST['submit']))
 			{
 				die('Could not enter data: ' . mysql_error());
 			}
-			echo "Entered data successfully" . '<br />';
+			echo "Entered data successfully:" . '<br />' . '<br />';
 		$query1 = ("SELECT * FROM problems ORDER BY id DESC");
 		$result1 = mysql_query($query1,$conn) or die ('Error in query: $query1, ' . mysql_error());	
 		
